@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id                  Int                 @id @default(autoincrement())
+  description         String
+  FkPublishHasProduct PublishHasProduct[]
+
+  @@map("product")
+}
+
+model ImpactPlatform {
+  id                            Int                           @id @default(autoincrement())
+  description                   String
+  FkPublishHasImpactedPlatforms PublishHasImpactedPlatforms[]
+
+  @@map("impact_platform")
+}
+
+model PublishClassification {
+  id          Int       @id @default(autoincrement())
+  description String
+  Publish     Publish[]
+
+  @@map("publish_classification")
+}
+
+model Publish {
+  id                            Int                           @id @default(autoincrement())
+  publishedDate                 DateTime                      @map("published_date")
+  publishClassificationId       Int                           @map("publish_classification_id")
+  title                         String
+  description                   String                        @db.Text
+  productOwner                  String                        @map("product_owner")
+  createdAt                     DateTime                      @default(now()) @map("created_at")
+  updatedAt                     DateTime                      @default(now()) @updatedAt @map("updated_at")
+  FkPublishClassification       PublishClassification         @relation(fields: [publishClassificationId], references: [id])
+  FkPublishHasProduct           PublishHasProduct[]
+  FkPublishHasImpactedPlatforms PublishHasImpactedPlatforms[]
+
+  @@map("publish")
+}
+
+model PublishHasProduct {
+  publishId Int     @map("publush_id")
+  productId Int     @map("product_id")
+  FkProduct Product @relation(fields: [productId], references: [id])
+  FkPublish Publish @relation(fields: [publishId], references: [id], onDelete: Cascade)
+
+  @@unique([publishId, productId])
+  @@map("publish_has_product")
+}
+
+model PublishHasImpactedPlatforms {
+  publishId        Int            @map("publish_id")
+  impactPlatformId Int            @map("impact_platform_id")
+  FkPublish        Publish        @relation(fields: [publishId], references: [id], onDelete: Cascade)
+  FkImpactPlatform ImpactPlatform @relation(fields: [impactPlatformId], references: [id], onDelete: Cascade)
+
+  @@unique([publishId, impactPlatformId])
+  @@map("publish_has_impacted_platforms")
+}
