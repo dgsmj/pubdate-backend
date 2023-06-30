@@ -41,14 +41,14 @@ export class PublishRepositoryPrisma implements CreatePublishRepository, FindAll
   ): Promise<FindAllPublishRepository.Output> {
     const { prisma } = PrismaHelper
     const conditions = []
-    if (input.productId) {
+    if (input.productId && Number.isInteger(+input.productId)) {
       conditions.push({
         FkPublishHasProduct: {
           some: { productId: +input.productId }
         }
       })
     }
-    if (input.classificationId) {
+    if (input.classificationId && Number.isInteger(+input.classificationId)) {
       conditions.push({
         publishClassificationId: +input.classificationId
       })

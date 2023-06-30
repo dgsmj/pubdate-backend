@@ -23,8 +23,9 @@ export class ExpressAdapter implements HttpServer {
         }
         res.json(output)
       } catch (error: any) {
-        res.status(422).json({
-          message: error.message
+        console.log('error:', error)
+        res.status(500).json({
+          error: 'Internal Server Error'
         })
       }
     })
